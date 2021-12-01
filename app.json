@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "react-naitve-animation",
+    "slug": "react-naitve-animation",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "react-naitve-animation"
+}
