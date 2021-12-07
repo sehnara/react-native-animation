@@ -11,7 +11,6 @@ const Container = styled.View`
   align-items: center;
 `;
 const Box = styled.View`
-  background-color: tomato;
   width: 200;
   height: 200;
 `;
@@ -23,21 +22,26 @@ export default function App() {
     setUp((prev) => !prev);
   };
   // useRef : 다시 렌더링 일어나도 value를 유지할게 하는 HOOK
-  const Y_POSITION = useRef(new Animated.Value(300)).current; // 1
+  const POSITION = useRef(new Animated.ValueXY({ x: 0, y: 300 })).current; // 1
 
   const moveUp = () => {
-    Animated.timing(Y_POSITION, {
+    Animated.timing(POSITION.y, {
       toValue: up ? 300 : -300,
-      duration: 2000,
-      useNativeDriver: true,
+      duration: 1000,
+      useNativeDriver: false, // backgroundColor를 interpolate할 때는 'false'로 두어야 한다.
     }).start(toggleUp); // start function is callback function. that is the event arise when animation ends
   };
 
-  const opacity = Y_POSITION.interpolate({
-    inputRange: [-300, -100, 100, 300],
-    outputRange: [1, 0, 0, 1],
+  const backgroundColor = POSITION.y.interpolate({
+    inputRange: [-300, 300],
+    outputRange: ["rgb(255, 99, 71)", "rgb(135, 206, 235)"],
   });
-  const borderRadius = Y_POSITION.interpolate({
+
+  const rotation = POSITION.y.interpolate({
+    inputRange: [-300, 300],
+    outputRange: ["-360deg", "360deg"],
+  });
+  const borderRadius = POSITION.y.interpolate({
     inputRange: [-300, 300],
     outputRange: [0, 200],
   });
@@ -46,9 +50,9 @@ export default function App() {
       <Pressable onPress={moveUp}>
         <AnimatedBox
           style={{
+            backgroundColor,
             borderRadius,
-            opacity,
-            transform: [{ translateY: Y_POSITION }],
+            transform: [{ translateY: POSITION.y }, { rotateY: rotation }],
           }}
         />
       </Pressable>
