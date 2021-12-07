@@ -36,3 +36,12 @@
 : 하지만 값을 유지하고 싶을 때! useRef를 이용
 
 - const y = useRef(new Animated.Value(0)).current; // 1
+
+## 4. Interpolate
+
+: 하나의 값으로 그 사이의 여러 값들을 가져옴
+
+- ex) const opacity = Y_POSITION.interpolate({
+  inputRange: [-300, -100, 100, 300],
+  outputRange: [1, 0, 0, 1],
+  });

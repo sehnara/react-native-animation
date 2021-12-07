@@ -1,5 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useRef, useState } from "react";
+import { Pressable } from "react-native";
 import { Animated, TouchableOpacity, Text } from "react-native";
 import { Easing } from "react-native-reanimated";
 import styled from "styled-components/native";
@@ -22,24 +23,35 @@ export default function App() {
     setUp((prev) => !prev);
   };
   // useRef : 다시 렌더링 일어나도 value를 유지할게 하는 HOOK
-  const y = useRef(new Animated.Value(0)).current; // 1
+  const Y_POSITION = useRef(new Animated.Value(300)).current; // 1
 
   const moveUp = () => {
-    Animated.timing(y, {
-      toValue: up ? 200 : -200,
+    Animated.timing(Y_POSITION, {
+      toValue: up ? 300 : -300,
+      duration: 2000,
       useNativeDriver: true,
-      easing: Easing.cubic,
     }).start(toggleUp); // start function is callback function. that is the event arise when animation ends
   };
 
-  // [y의 값을 얻고 싶을 때]
-  y.addListener(() => console.log("Animated State : ", y));
-  console.log("Component State:", y);
+  const opacity = Y_POSITION.interpolate({
+    inputRange: [-300, -100, 100, 300],
+    outputRange: [1, 0, 0, 1],
+  });
+  const borderRadius = Y_POSITION.interpolate({
+    inputRange: [-300, 300],
+    outputRange: [0, 200],
+  });
   return (
     <Container>
-      <TouchableOpacity onPress={moveUp}>
-        <AnimatedBox style={{ transform: [{ translateY: y }] }} />
-      </TouchableOpacity>
+      <Pressable onPress={moveUp}>
+        <AnimatedBox
+          style={{
+            borderRadius,
+            opacity,
+            transform: [{ translateY: Y_POSITION }],
+          }}
+        />
+      </Pressable>
     </Container>
   );
 }
