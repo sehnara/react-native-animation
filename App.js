@@ -1,5 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useRef, useState } from "react";
+import { Dimensions } from "react-native";
 import { Pressable } from "react-native";
 import { Animated, TouchableOpacity, Text } from "react-native";
 import { Easing } from "react-native-reanimated";
@@ -16,20 +17,52 @@ const Box = styled.View`
 `;
 
 const AnimatedBox = Animated.createAnimatedComponent(Box); // 2
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+
 export default function App() {
-  const [up, setUp] = useState(true);
-  const toggleUp = () => {
-    setUp((prev) => !prev);
-  };
   // useRef : 다시 렌더링 일어나도 value를 유지할게 하는 HOOK
-  const POSITION = useRef(new Animated.ValueXY({ x: 0, y: 300 })).current; // 1
+  const POSITION = useRef(
+    new Animated.ValueXY({
+      x: -SCREEN_WIDTH / 2 + 100,
+      y: -SCREEN_HEIGHT / 2 + 100,
+    })
+  ).current; // 1
+  const topLeft = Animated.timing(POSITION, {
+    toValue: {
+      x: -SCREEN_WIDTH / 2 + 100,
+      y: -SCREEN_HEIGHT / 2 + 100,
+    },
+    useNativeDriver: false,
+  });
+
+  const bottomLeft = Animated.timing(POSITION, {
+    toValue: {
+      x: -SCREEN_WIDTH / 2 + 100,
+      y: SCREEN_HEIGHT / 2 - 100,
+    },
+    useNativeDriver: false,
+  });
+
+  const bottomRight = Animated.timing(POSITION, {
+    toValue: {
+      x: SCREEN_WIDTH / 2 - 100,
+      y: SCREEN_HEIGHT / 2 - 100,
+    },
+    useNativeDriver: false,
+  });
+
+  const topRight = Animated.timing(POSITION, {
+    toValue: {
+      x: SCREEN_WIDTH / 2 - 100,
+      y: -SCREEN_HEIGHT / 2 + 100,
+      useNativeDriver: false,
+    },
+  });
 
   const moveUp = () => {
-    Animated.timing(POSITION.y, {
-      toValue: up ? 300 : -300,
-      duration: 1000,
-      useNativeDriver: false, // backgroundColor를 interpolate할 때는 'false'로 두어야 한다.
-    }).start(toggleUp); // start function is callback function. that is the event arise when animation ends
+    Animated.loop(
+      Animated.sequence([bottomLeft, bottomRight, topRight, topLeft])
+    ).start();
   };
 
   const backgroundColor = POSITION.y.interpolate({
@@ -45,6 +78,8 @@ export default function App() {
     inputRange: [-300, 300],
     outputRange: [0, 200],
   });
+
+  POSITION.addListener(() => console.log(POSITION));
   return (
     <Container>
       <Pressable onPress={moveUp}>
@@ -52,7 +87,7 @@ export default function App() {
           style={{
             backgroundColor,
             borderRadius,
-            transform: [{ translateY: POSITION.y }, { rotateY: rotation }],
+            transform: [...POSITION.getTranslateTransform()],
           }}
         />
       </Pressable>
